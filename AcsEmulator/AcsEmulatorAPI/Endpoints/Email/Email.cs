@@ -26,7 +26,7 @@ namespace AcsEmulatorAPI.Endpoints.Email
         {
             if (Random.Shared.Next(4) != 0)
             {
-                httpContext.Response.Headers.Add("retry-after", "2000");
+                httpContext.Response.Headers.Add("retry-after", "2");
                 return Results.Ok(new EmailSendResult(operationId, EmailStatus.RUNNING));
             }
             return Results.Ok(new EmailSendResult(operationId, EmailStatus.SUCCEEDED));
@@ -36,8 +36,8 @@ namespace AcsEmulatorAPI.Endpoints.Email
         private static async Task<IResult> SendEmailAsync(AcsDbContext db, EmailMessage emailRequest, [FromHeader(Name = "Operation-Id")] string? clientOperationId, HttpContext httpContext)
         {
             var operationId = clientOperationId ?? Guid.NewGuid().ToString();
-            httpContext.Response.Headers.Add("retry-after", "2000");
-            var location = $"https://{httpContext.Request.Host}/emails/operations/{operationId}";
+            httpContext.Response.Headers.Add("retry-after", "2");
+            var location = $"{httpContext.Request.Scheme}://{httpContext.Request.Host}{httpContext.Request.PathBase}/emails/operations/{operationId}";
             httpContext.Response.Headers.Add("Operation-Location", location);
 
             db.EmailMessages.Add(EmailMessageInternal.FromApiModel(emailRequest, operationId));
