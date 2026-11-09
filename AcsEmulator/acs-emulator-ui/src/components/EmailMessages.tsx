@@ -5,13 +5,17 @@ import {
   CommandBar,
   ICommandBarItemProps,
   IColumn,
+  DetailsRow,
+  Link,
   ShimmeredDetailsList,
   SelectionMode
 } from '@fluentui/react';
 import { EmailMessage, getAllEmails } from '../services/email';
+import { EmailPreview } from './EmailPreview';
 
 export const EmailMessages = () => {
   const [loadedEmailMessages, setLoadedEmailMessages] = useState<EmailMessage[] | undefined>(undefined);
+  const [selectedEmail, setSelectedEmail] = useState<EmailMessage | undefined>(undefined);
 
   const stackTokens: IStackTokens = {
     childrenGap: 5,
@@ -46,7 +50,12 @@ export const EmailMessages = () => {
       name: 'Operation Id',
       fieldName: 'operationId',
       minWidth: 150,
-      data: 'string'
+      data: 'string',
+      onRender: (email: EmailMessage) => (
+        <Link onClick={() => setSelectedEmail(email)} aria-label={`Preview email ${email.operationId}`}>
+          {email.operationId}
+        </Link>
+      )
     },
     {
       key: 'from',
@@ -82,7 +91,6 @@ export const EmailMessages = () => {
       fieldName: 'subject',
       minWidth: 150,
       maxWidth: 250,
-      isMultiline: true,
       data: 'string'
     },
     {
@@ -91,7 +99,6 @@ export const EmailMessages = () => {
       fieldName: 'plainText',
       minWidth: 150,
       maxWidth: 250,
-      isMultiline: true,
       data: 'string'
     },
     {
@@ -100,7 +107,6 @@ export const EmailMessages = () => {
       fieldName: 'html',
       minWidth: 150,
       maxWidth: 250,
-      isMultiline: true,
       data: 'string'
     },
     {
@@ -134,7 +140,22 @@ export const EmailMessages = () => {
         enableShimmer={!loadedEmailMessages}
         columns={columns}
         selectionMode={SelectionMode.none}
+        onItemInvoked={(email: EmailMessage) => setSelectedEmail(email)}
+        onRenderRow={props => props ? (
+          <DetailsRow
+            {...props}
+            data-selection-invoke={true}
+            styles={{ root: { cursor: 'pointer' } }}
+          />
+        ) : null}
       />
+      {selectedEmail && (
+        <EmailPreview
+          key={selectedEmail.operationId}
+          email={selectedEmail}
+          onDismiss={() => setSelectedEmail(undefined)}
+        />
+      )}
     </Stack>
   );
 }
