@@ -1,0 +1,24 @@
+services:
+  server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: server
+    volumes:
+      - ..:/workspaces/acs-emulator:cached
+      - acs-emulator-data:/data
+      - acs-emulator-ui-dependencies:/workspaces/acs-emulator/AcsEmulator/acs-emulator-ui/node_modules
+    init: true
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:8025
+      ASPNETCORE_WEBROOT: /workspaces/acs-emulator/AcsEmulator/acs-emulator-ui/build
+      REACT_APP_API_URL: http://localhost:8025
+      HOST: 0.0.0.0
+      BROWSER: none
+      DisableHttpsRedirection: "true"
+      ConnectionStrings__EmulatorDb: Data Source=/data/AcsEmulator.db
+
+volumes:
+  acs-emulator-data:
+  acs-emulator-ui-dependencies:

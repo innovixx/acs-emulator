@@ -1,0 +1,22 @@
+{
+	"name": "ACS Emulator",
+	"dockerComposeFile": "docker-compose.yml",
+	"service": "server",
+	"runServices": [
+		"server"
+	],
+	"overrideCommand": false,
+	"workspaceFolder": "/workspaces/acs-emulator",
+	"shutdownAction": "stopCompose",
+	"remoteUser": "vscode",
+	"forwardPorts": [
+		8025
+	],
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"ms-dotnettools.csharp"
+			]
+		}
+	}
+}

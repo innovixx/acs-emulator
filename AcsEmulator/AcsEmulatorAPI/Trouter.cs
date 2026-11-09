@@ -18,7 +18,7 @@ namespace AcsEmulatorAPI
         public void AddEndpoints(WebApplication app)
         {
             // uses x-skypetoken header, not auth header
-            app.MapPost("/v4/a", dynamic ([FromHeader(Name = "x-skypetoken")] string skypeTokenHeader) =>
+            app.MapPost("/v4/a", dynamic ([FromHeader(Name = "x-skypetoken")] string skypeTokenHeader, HttpRequest request) =>
             {
                 var token = ValidateToken(skypeTokenHeader, app.Configuration["JwtSigningKey"]);
                 if (token is null)
@@ -28,15 +28,16 @@ namespace AcsEmulatorAPI
                 var sr = NewRandomBase64();
                 _srToSkypeId[sr] = token.Claims.First(x => x.Type == "skypeid").Value;
 
+                var endpoint = $"{request.Scheme}://{request.Host}";
                 return new
                 {
                     ccid = "Q0du9A4hdNg",
                     id = sessionId,
-                    socketio = $"https://localhost",
-                    surl = $"https://localhost/trouter/f/{sessionId}/",
-                    url = $"https://localhost/trouter/f/{sessionId}/",
+                    socketio = endpoint,
+                    surl = $"{endpoint}/trouter/f/{sessionId}/",
+                    url = $"{endpoint}/trouter/f/{sessionId}/",
                     ttl = "585731",
-                    healthUrl = $"https://localhost/trouter/h",
+                    healthUrl = $"{endpoint}/trouter/h",
                     curlb = "https://pub-ent-sece-05-t.trouter.teams.microsoft.com:443",
                     connectparams = new
                     {

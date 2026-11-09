@@ -125,6 +125,8 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 app.UseSwagger();
 app.UseSwaggerUI();
+app.UseDefaultFiles();
+app.UseStaticFiles();
 
 using (var scope = app.Services.CreateScope())
 {
@@ -135,7 +137,10 @@ using (var scope = app.Services.CreateScope())
 	// TODO: seed data if we want
 }
 
-app.UseHttpsRedirection();
+if (!builder.Configuration.GetValue<bool>("DisableHttpsRedirection"))
+{
+	app.UseHttpsRedirection();
+}
 app.UseCors();
 
 app.UseAuthentication();
@@ -152,6 +157,7 @@ app.Services.GetService<Trouter>()!.AddEndpoints(app);
 app.Services.GetService<CallAutomationWebSockets>()!.AddEndpoints(app);
 app.Services.GetService<CallAutomationController>()!.AddEndpoints(app);
 
+app.MapFallbackToFile("index.html");
 app.Run();
 
 // Allow Unit testing of ASP .NET
