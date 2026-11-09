@@ -1,0 +1,15 @@
+.git
+.github
+.devcontainer
+**/bin
+**/obj
+**/node_modules
+**/build
+**/.env
+**/.env.*
+**/*.pfx
+**/*.p12
+**/*.key
+**/*.db
+**/*.db-*
+demo
