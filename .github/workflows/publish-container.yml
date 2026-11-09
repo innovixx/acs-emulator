@@ -51,6 +51,6 @@ jobs:
           tags: ${{ steps.metadata.outputs.tags }}
           labels: ${{ steps.metadata.outputs.labels }}
           build-args: |
-            REACT_APP_API_URL=${{ vars.EMULATOR_API_URL || 'http://localhost:8080' }}
+            REACT_APP_API_URL=${{ vars.EMULATOR_API_URL || 'http://localhost:8025' }}
           cache-from: type=gha
           cache-to: type=gha,mode=max

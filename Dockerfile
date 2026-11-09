@@ -19,12 +19,14 @@ FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 WORKDIR /app
 COPY --from=api-build /app/publish ./
 COPY --from=ui-build /src/ui/build ./wwwroot/
-ENV ASPNETCORE_HTTP_PORTS=8080 \
+ENV ASPNETCORE_ENVIRONMENT=Production \
+    ASPNETCORE_URLS=http://+:8025 \
+    ASPNETCORE_WEBROOT=/app/wwwroot \
     DisableHttpsRedirection=true \
     ConnectionStrings__EmulatorDb="Data Source=/data/AcsEmulator.db" \
     EventGridSimulatorSystemTopicHostname="" \
     EventGridSimulatorSystemTopicCredentials=""
 RUN mkdir /data && chown app:app /data
 USER app
-EXPOSE 8080
+EXPOSE 8025
 ENTRYPOINT ["dotnet", "AcsEmulatorAPI.dll"]
