@@ -11,12 +11,12 @@ export const Header = () => {
     verticalAlign: 'middle',
   });
 
-  const createAccountStyles = mergeStyles({
-    float: 'right',
-    lineHeight: '60px',
-    paddingRight: '10px',
-    textDecoration: 'none',
-  });
+  // const createAccountStyles = mergeStyles({
+  //   float: 'right',
+  //   lineHeight: '60px',
+  //   paddingRight: '10px',
+  //   textDecoration: 'none',
+  // });
 
   return (
     <div className={headerStyles}>
@@ -26,11 +26,11 @@ export const Header = () => {
       <span className={titleStyles}>
         <Text variant='large'>Azure Communication Services Emulator</Text>
       </span>
-      <Link href="https://learn.microsoft.com/azure/communication-services/quickstarts/create-communication-resource" target='_blank'>
+      {/* <Link href="https://learn.microsoft.com/azure/communication-services/quickstarts/create-communication-resource" target='_blank'>
         <span className={createAccountStyles}>
           <Text variant='xLarge'>CREATE AN AZURE COMMUNICATION SERVICES ACCOUNT &gt;</Text>
         </span>
-      </Link>
+      </Link> */}
     </div>
   );
 }
