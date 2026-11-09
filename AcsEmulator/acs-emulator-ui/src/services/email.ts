@@ -1,5 +1,12 @@
 import { ApiUrl } from "./apiUrl";
 
+export interface EmailAttachment {
+  id: string;
+  name: string;
+  type: string | null;
+  contentBytesBase64: string;
+}
+
 // subset
 export interface EmailMessage {
   operationId: string,
@@ -11,15 +18,12 @@ export interface EmailMessage {
   plainText: string,
   html: string,
   replyTo: string,
-  attachments: string,
+  attachments: EmailAttachment[],
   disableUserEngagementTracking: boolean
 }
 
 export const getAllEmails = async (): Promise<EmailMessage[]>  => {
   const response = await fetch(`${ApiUrl}/admin/emails`);  
   const data = await response.json();
-  for (const email of data.value) {
-    email.attachments = email.attachments.map((x: { name: string; }) => x.name).join(',')
-  }
   return data.value;
 }

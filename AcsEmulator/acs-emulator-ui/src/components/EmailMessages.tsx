@@ -121,7 +121,8 @@ export const EmailMessages = () => {
       name: 'Attachments',
       fieldName: 'attachments',
       minWidth: 100,
-      data: 'string'
+      data: 'string',
+      onRender: (email: EmailMessage) => email.attachments.map(attachment => attachment.name).join(', ')
     },
     {
       key: 'disableUserEngagementTracking',

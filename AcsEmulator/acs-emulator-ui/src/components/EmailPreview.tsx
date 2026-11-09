@@ -1,4 +1,4 @@
-import { Panel, PanelType, Pivot, PivotItem } from '@fluentui/react';
+import { Link, Panel, PanelType, Pivot, PivotItem } from '@fluentui/react';
 import { EmailMessage } from '../services/email';
 
 interface EmailPreviewProps {
@@ -14,7 +14,6 @@ export const EmailPreview = ({ email, onDismiss }: EmailPreviewProps) => {
     { label: 'Cc', value: email.cc },
     { label: 'Bcc', value: email.bcc },
     { label: 'Reply To', value: email.replyTo },
-    { label: 'Attachments', value: email.attachments },
     { label: 'Disable Tracking', value: String(email.disableUserEngagementTracking) }
   ];
 
@@ -34,6 +33,26 @@ export const EmailPreview = ({ email, onDismiss }: EmailPreviewProps) => {
             <dd style={{ margin: 0, whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}>{header.value}</dd>
           </div>
         ))}
+        {email.attachments.length > 0 && (
+          <div style={{ display: 'contents' }}>
+            <dt style={{ fontWeight: 600 }}>Attachments</dt>
+            <dd style={{ margin: 0, overflowWrap: 'anywhere' }}>
+              <ul style={{ margin: 0, paddingLeft: 20 }}>
+                {email.attachments.map(attachment => (
+                  <li key={attachment.id}>
+                    <Link
+                      href={`data:application/octet-stream;base64,${attachment.contentBytesBase64}`}
+                      download={attachment.name}
+                      aria-label={`Download ${attachment.name}`}
+                    >
+                      {attachment.name}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </dd>
+          </div>
+        )}
       </dl>
       <Pivot aria-label="Email content" defaultSelectedKey={email.html ? 'html' : 'plainText'}>
         <PivotItem headerText="HTML" itemKey="html">

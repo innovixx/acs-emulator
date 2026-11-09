@@ -4,6 +4,7 @@ using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.Configuration;
 using System.Net;
 using System.Net.Http.Json;
+using System.Text;
 using System.Text.Json;
 
 namespace AcsEmulatorAPI.Tests
@@ -33,6 +34,56 @@ namespace AcsEmulatorAPI.Tests
         {
             _factory.Dispose();
             _connection.Dispose();
+        }
+
+        [DataTestMethod]
+        [DataRow(0)]
+        [DataRow(2)]
+        public async Task AdminEmailsReturnsOriginalAttachmentContents(int attachmentCount)
+        {
+            using var client = _factory.CreateClient();
+            var attachments = new[]
+            {
+                new
+                {
+                    name = "email-html.txt",
+                    contentType = "text/plain",
+                    contentInBase64 = Convert.ToBase64String(Encoding.UTF8.GetBytes("<p>Hello \u00e9</p>"))
+                },
+                new
+                {
+                    name = "binary.bin",
+                    contentType = "application/octet-stream",
+                    contentInBase64 = Convert.ToBase64String(new byte[] { 0, 1, 2, 127, 128, 255 })
+                }
+            }.Take(attachmentCount).ToArray();
+
+            using var sendResponse = await client.PostAsJsonAsync("/emails:send?api-version=2023-03-31", new
+            {
+                senderAddress = "sender@example.com",
+                content = new { subject = "Attachments", plainText = "Hello", html = "<p>Hello</p>" },
+                recipients = new { to = new[] { new { address = "recipient@example.com" } } },
+                attachments
+            });
+            Assert.AreEqual(HttpStatusCode.Accepted, sendResponse.StatusCode);
+
+            using var response = await client.GetAsync("/admin/emails");
+            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+            var result = await response.Content.ReadFromJsonAsync<JsonElement>();
+            var emails = result.GetProperty("value").EnumerateArray().ToArray();
+            Assert.AreEqual(1, emails.Length);
+            var storedAttachments = emails[0].GetProperty("attachments").EnumerateArray().ToArray();
+            Assert.AreEqual(attachmentCount, storedAttachments.Length);
+
+            foreach (var attachment in attachments)
+            {
+                var stored = storedAttachments.Single(item => item.GetProperty("name").GetString() == attachment.name);
+                Assert.IsFalse(string.IsNullOrEmpty(stored.GetProperty("id").GetString()));
+                Assert.AreEqual(attachment.contentType, stored.GetProperty("type").GetString());
+                CollectionAssert.AreEqual(
+                    Convert.FromBase64String(attachment.contentInBase64),
+                    Convert.FromBase64String(stored.GetProperty("contentBytesBase64").GetString()!));
+            }
         }
 
         [DataTestMethod]

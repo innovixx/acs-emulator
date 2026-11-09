@@ -74,7 +74,7 @@ namespace AcsEmulatorAPI.Models
 			{
 				Id = Guid.NewGuid().ToString(),
 				Name = x.name,
-				Type = x.type,
+				Type = x.contentType,
 				ContentBytesBase64 = x.contentInBase64
 			}).ToArray() ?? Array.Empty<EmailMessageAttachment>()
 		};

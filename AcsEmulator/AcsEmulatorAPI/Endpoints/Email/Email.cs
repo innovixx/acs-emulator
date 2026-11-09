@@ -1,5 +1,6 @@
 ﻿using AcsEmulatorAPI.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace AcsEmulatorAPI.Endpoints.Email
 {
@@ -15,7 +16,7 @@ namespace AcsEmulatorAPI.Endpoints.Email
             group.MapGet("/admin/emails", (AcsDbContext db) => Results.Ok(new
             {
                 // todo: we're sending down the DB schema because we're lazy. A proper /emails collection would use the API schema
-                value = db.EmailMessages
+                value = db.EmailMessages.Include(email => email.Attachments)
             }));
 
             return group;
@@ -56,7 +57,7 @@ namespace AcsEmulatorAPI.Endpoints.Email
 
         internal record EmailAddress(string address, string displayName);
 
-        internal record EmailAttachment(string name, string type, string contentInBase64);
+        internal record EmailAttachment(string name, string contentType, string contentInBase64);
 
         internal static class EmailStatus
         {
