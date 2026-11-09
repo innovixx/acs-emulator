@@ -7,10 +7,11 @@ on:
 
 permissions:
   contents: read
+  packages: write
 
 jobs:
   publish:
-    name: Publish to Azure Container Registry
+    name: Publish to GitHub Container Registry
     runs-on: ubuntu-latest
     environment: production
 
@@ -18,12 +19,12 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Log in to Azure Container Registry
-        uses: azure/docker-login@v2
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
         with:
-          login-server: ${{ vars.INVX_AZURE_CONTAINER_REGISTRY_NAME }}.azurecr.io
-          username: ${{ vars.AZURE_CONTAINER_REGISTRY_USERNAME }}
-          password: ${{ secrets.AZURE_CONTAINER_REGISTRY_PASSWORD }}
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set up Docker Buildx
         id: buildx
@@ -35,7 +36,7 @@ jobs:
         id: metadata
         uses: docker/metadata-action@v5
         with:
-          images: ${{ vars.INVX_AZURE_CONTAINER_REGISTRY_NAME }}.azurecr.io/${{ github.event.repository.name }}
+          images: ghcr.io/${{ github.repository }}
           tags: |
             type=raw,value=${{ github.event.release.tag_name }},enable=${{ github.event_name == 'release' }}
             type=raw,value=latest,enable=${{ github.event_name == 'workflow_dispatch' }}
